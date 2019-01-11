@@ -633,7 +633,7 @@ uint8_t LengthDisasm(void *Address, int Is64Bit, PInstruction Data)
 		Data->Length++;
 	}
 
-	if (Is64Bit && ((*Ip >= 0x40) ? (*Ip <= 0x4F) : 0)) // REX
+	if (Is64Bit && ((*Ip & 0xF0) == 0x40)) // REX
 	{
 		Data->Flags |= F_REX;
 
@@ -696,12 +696,15 @@ uint8_t LengthDisasm(void *Address, int Is64Bit, PInstruction Data)
 		Data->MODRM.Reg   = (Data->ModRMByte & 0x38) >> 3;
 		Data->MODRM.Rm    = (Data->ModRMByte & 7);
 
-        if (Data->Opcode[0] == 0xF6 && (Data->MODRM.Reg == 0 || Data->MODRM.Reg == 1))
-            Data->Flags |= OP_DATA_I8;
-        if (Data->Opcode[0] == 0xF7 && (Data->MODRM.Reg == 0 || Data->MODRM.Reg == 1))
-            Data->Flags |= OP_DATA_I16_I32_I64;
-
 		Data->Length++;
+
+		if (Data->MODRM.Reg <= 1)
+		{
+			if (Data->Opcode[0] == 0xF6)
+				Data->Flags |= OP_DATA_I8;
+			if (Data->Opcode[0] == 0xF7)
+				Data->Flags |= OP_DATA_I16_I32_I64;
+		}
 
 		if (Data->MODRM.Mod != 3 && Data->MODRM.Rm == 4 && !(!Is64Bit && (Data->Flags & F_PREFIX67))) // SIB
 		{
@@ -833,7 +836,7 @@ uint32_t GetSizeOfProc(void *Address, int Is64Bit)
 		{
 			(int)Offset += Size;
 			Result += Size;
-		} 
+		}
 		else
 			break;
 	}
