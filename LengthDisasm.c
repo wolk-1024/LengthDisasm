@@ -585,7 +585,7 @@ static uint8_t FlagsTableEx[256] =
           Mod R/M Byte               SIB Byte
 */
 
-uint8_t LengthDisasm(void *Address, int Is64Bit, PInstruction Data)
+uint8_t LengthDisasm(void *Address, uint8_t Is64Bit, PInstruction Data)
 {
 	if (!Address || !Data)
 		return 0;
@@ -737,7 +737,6 @@ uint8_t LengthDisasm(void *Address, int Is64Bit, PInstruction Data)
 					Data->DisplacementSize = 2;
 				else
 					Data->DisplacementSize = 4;
-			    break;
 		}
 	}
 
@@ -822,23 +821,22 @@ uint8_t LengthDisasm(void *Address, int Is64Bit, PInstruction Data)
 
 /*
 */
-uint32_t GetSizeOfProc(void *Address, int Is64Bit)
+uint32_t GetSizeOfProc(void *Address, uint8_t Is64Bit)
 {
 	TInstruction Data = { 0 };
 
-	void *Offset = Address;
-
-	int Result = 0, Size = 0;
+	uint8_t Size = 0;
+	uint32_t Result = 0;
+	uint8_t *Offset = Address;
 
 	while (Size = LengthDisasm(Offset, Is64Bit, &Data))
 	{
-		if ((Data.Opcode[0] != 0xC3) && (Data.Opcode[0] != 0xC2)) // ret или retn
-		{
-			(int)Offset += Size;
-			Result += Size;
-		}
-		else
+		Result += Size;
+
+		if ((Data.Opcode[0] == 0xC3) || (Data.Opcode[0] == 0xC2)) // ret или retn
 			break;
+
+		Offset += Size;
 	}
-	return Size ? 0 : ++Result;
+	return Result;
 }

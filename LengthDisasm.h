@@ -51,8 +51,6 @@
 #define MAX_OPCODE_SIZE 3       // Максимальный размер опкода инструкции.
 #define MAX_INSTRUCTION_SIZE 15 // Максимальный размер инструкции.
 
-#define BitTest(A, B) (A & (1 << B)) > 0;
-
 typedef enum TPrefixes
 {
 	LockPrefix                = 0xF0,
@@ -128,8 +126,8 @@ typedef struct TInstruction
 extern "C" {
 #endif
 
-uint8_t LengthDisasm(void *Address, int Is64Bit, PInstruction Data);
-uint32_t GetSizeOfProc(void *Address, int Is64Bit);
+uint8_t LengthDisasm(void *Address, uint8_t Is64Bit, PInstruction Data);
+uint32_t GetSizeOfProc(void *Address, uint8_t Is64Bit);
 
 #ifdef __cplusplus
 }
