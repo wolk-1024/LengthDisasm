@@ -585,12 +585,12 @@ static uint8_t FlagsTableEx[256] =
           Mod R/M Byte               SIB Byte
 */
 
-uint8_t LengthDisasm(void *Address, uint8_t Is64Bit, PInstruction Data)
+uint8_t LengthDisasm(void *Address, uint8_t Is64Bit, PLengthDisasm Data)
 {
 	if (!Address || !Data)
 		return 0;
 
-	__stosb(Data, 0, sizeof(TInstruction));
+	__stosb(Data, 0, sizeof(TLengthDisasm));
 
 	uint8_t OpFlag = 0;
 
@@ -717,6 +717,7 @@ uint8_t LengthDisasm(void *Address, uint8_t Is64Bit, PInstruction Data)
 
 			Data->Length++;
 		}
+
 		switch (Data->MODRM.Mod)
 		{
 		    case 0:
@@ -811,7 +812,7 @@ uint8_t LengthDisasm(void *Address, uint8_t Is64Bit, PInstruction Data)
 		Ip += Data->ImmediateDataSize;
 	}
 
-	if (Data->Length >= MAX_INSTRUCTION_SIZE)
+	if (Data->Length > MAX_INSTRUCTION_SIZE)
 	{
 		Data->Flags |= F_INVALID;
 		return 0;
@@ -823,7 +824,7 @@ uint8_t LengthDisasm(void *Address, uint8_t Is64Bit, PInstruction Data)
 */
 uint32_t GetSizeOfProc(void *Address, uint8_t Is64Bit)
 {
-	TInstruction Data = { 0 };
+	TLengthDisasm Data = { 0 };
 
 	uint8_t Size = 0;
 	uint32_t Result = 0;
@@ -839,4 +840,61 @@ uint32_t GetSizeOfProc(void *Address, uint8_t Is64Bit)
 		Offset += Size;
 	}
 	return Result;
+}
+
+/*
+*/
+uint8_t LengthAssemble(void *Buffer, PLengthDisasm Data)
+{
+	if (!Buffer || !Data)
+		return 0;
+
+	uint8_t *pCode = Buffer;
+
+	if (Data->Flags & F_PREFIX)
+	{
+		__movsb(pCode, (uint8_t*)&Data->Prefix, Data->PrefixesCount);
+
+		pCode += Data->PrefixesCount;
+	}
+
+	if (Data->Flags & F_REX)
+	{
+		*pCode = Data->REXByte;
+
+		pCode++;
+	}
+
+	__movsb(pCode, (uint8_t*)&Data->Opcode, Data->OpcodeSize);
+
+	pCode += Data->OpcodeSize;
+
+	if (Data->Flags & F_MODRM)
+	{
+		*pCode = Data->ModRMByte;
+
+		pCode++;
+	}
+
+	if (Data->Flags & F_SIB)
+	{
+		*pCode = Data->SIBByte;
+
+		pCode++;
+	}
+
+	if (Data->Flags & F_DISP)
+	{
+		__movsb(pCode, (uint8_t*)&Data->AddressDisplacement, Data->DisplacementSize);
+
+		pCode += Data->DisplacementSize;
+	}
+
+	if (Data->Flags & F_IMM)
+	{
+		__movsb(pCode, (uint8_t*)&Data->ImmediateData, Data->ImmediateDataSize);
+
+		pCode += Data->ImmediateDataSize;
+	}
+	return Data->Length;
 }

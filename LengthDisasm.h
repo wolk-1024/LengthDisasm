@@ -67,7 +67,7 @@ typedef enum TPrefixes
 }
 TPrefixes;
 
-typedef struct TInstruction
+typedef struct TLengthDisasm
 {
 	uint8_t Length;
 	uint8_t PrefixesCount;
@@ -120,14 +120,15 @@ typedef struct TInstruction
 		uint64_t ImmediateData64;
 	} ImmediateData;
 	uint32_t Flags;
-} TInstruction, *PInstruction;
+} TLengthDisasm, *PLengthDisasm;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-uint8_t LengthDisasm(void *Address, uint8_t Is64Bit, PInstruction Data);
+uint8_t LengthDisasm(void *Address, uint8_t Is64Bit, PLengthDisasm Data);
 uint32_t GetSizeOfProc(void *Address, uint8_t Is64Bit);
+uint8_t LengthAssemble(void *Buffer, PLengthDisasm Data);
 
 #ifdef __cplusplus
 }
