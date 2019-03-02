@@ -15,8 +15,8 @@
 *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _LDASM_
-#define _LDASM_
+#ifndef _H_LDASM_
+#define _H_LDASM_
 
 #include <stdint.h>
 
@@ -27,7 +27,7 @@
 #define OP_DATA_I16_I32_I64 0x08
 #define OP_EXTENDED         0x10
 #define OP_RELATIVE         0x20
-#define OP_MODRM            0x40     
+#define OP_MODRM            0x40
 #define OP_PREFIX           0x80
 #define OP_INVALID          0xff
 
@@ -134,4 +134,4 @@ uint8_t LengthAssemble(void *Buffer, PLengthDisasm Data);
 }
 #endif
 
-#endif /* _LDASM_ */
+#endif /* _H_LDASM_ */

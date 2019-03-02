@@ -701,9 +701,9 @@ uint8_t LengthDisasm(void *Address, uint8_t Is64Bit, PLengthDisasm Data)
 		if (Data->MODRM.Reg <= 1)
 		{
 			if (Data->Opcode[0] == 0xF6)
-				Data->Flags |= OP_DATA_I8;
+				OpFlag |= OP_DATA_I8;
 			if (Data->Opcode[0] == 0xF7)
-				Data->Flags |= OP_DATA_I16_I32_I64;
+				OpFlag |= OP_DATA_I16_I32_I64;
 		}
 
 		if (Data->MODRM.Mod != 3 && Data->MODRM.Rm == 4 && !(!Is64Bit && (Data->Flags & F_PREFIX67))) // SIB
