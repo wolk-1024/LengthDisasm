@@ -721,12 +721,15 @@ uint8_t LengthDisasm(void *Address, uint8_t Is64Bit, PLengthDisasm Data)
 		switch (Data->MODRM.Mod)
 		{
 		    case 0:
-				if (Data->MODRM.Rm == 5 || Data->SIB.Base == 5)
+				if (Data->MODRM.Rm == 5)
 				{
 					Data->DisplacementSize = 4;
 					if (Is64Bit)
 						Data->Flags |= F_RELATIVE;
 				}
+				if (Data->SIB.Base == 5)
+					Data->DisplacementSize = 4;
+
 				if ((Data->MODRM.Rm == 6) && (Data->Flags & F_PREFIX67))
 					Data->DisplacementSize = 2;
 			    break;
