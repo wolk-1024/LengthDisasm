@@ -908,5 +908,5 @@ uint8_t LengthAssemble(void *Buffer, PLengthDisasm Data)
 
 		pCode += Data->ImmediateDataSize;
 	}
-	return Data->Length;
+	return pCode - (uint8_t *)Buffer;
 }
