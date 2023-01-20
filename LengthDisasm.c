@@ -21,6 +21,7 @@
 */
 
 #include "LengthDisasm.h"
+#include <string.h>
 
 static uint8_t FlagsTable[256] =
 {
@@ -572,6 +573,8 @@ static uint8_t FlagsTableEx[256] =
 	/* 0FFF */	OP_INVALID,
 };
 
+#define bittest(v, n) ((*v) & ((uint8_t)1 << (n)))
+
 /*
                               Структура инструкции:
 
@@ -595,7 +598,8 @@ uint8_t LengthDisasm(void *Address, uint8_t Is64Bit, PLengthDisasm Data)
 	if (!Address || !Data)
 		return 0;
 
-	__stosb(Data, 0, sizeof(TLengthDisasm));
+	memset(Data, 0x00, sizeof(TLengthDisasm));
+	// memset(Data, 0x00, sizeof(PLengthDisasm));
 
 	uint8_t OpFlag = 0;
 
@@ -642,10 +646,10 @@ uint8_t LengthDisasm(void *Address, uint8_t Is64Bit, PLengthDisasm Data)
 	{
 		Data->Flags |= F_REX;
 
-		Data->REX.B = _bittest(Ip, 0);
-		Data->REX.X = _bittest(Ip, 1);
-		Data->REX.R = _bittest(Ip, 2);
-		Data->REX.W = _bittest(Ip, 3);
+		Data->REX.B = bittest(Ip, 0);
+		Data->REX.X = bittest(Ip, 1);
+		Data->REX.R = bittest(Ip, 2);
+		Data->REX.W = bittest(Ip, 3);
 
 		Data->REXByte = *Ip++;
 
@@ -687,7 +691,7 @@ uint8_t LengthDisasm(void *Address, uint8_t Is64Bit, PLengthDisasm Data)
 		}
 	}
 
-	__movsb(&Data->Opcode, Ip, Data->OpcodeSize); //  Копируем опкод
+	memcpy(&Data->Opcode, Ip, Data->OpcodeSize); //  Копируем опкод
 
 	Data->Length += Data->OpcodeSize;
 	Ip += Data->OpcodeSize;
@@ -861,7 +865,7 @@ uint8_t LengthAssemble(void *Buffer, PLengthDisasm Data)
 
 	if (Data->Flags & F_PREFIX)
 	{
-		__movsb(pCode, (uint8_t*)&Data->Prefix, Data->PrefixesCount);
+		memcpy(pCode, (uint8_t *)&Data->Prefix, Data->PrefixesCount);
 
 		pCode += Data->PrefixesCount;
 	}
@@ -873,7 +877,7 @@ uint8_t LengthAssemble(void *Buffer, PLengthDisasm Data)
 		pCode++;
 	}
 
-	__movsb(pCode, (uint8_t*)&Data->Opcode, Data->OpcodeSize);
+	memcpy(pCode, (uint8_t *)&Data->Opcode, Data->OpcodeSize);
 
 	pCode += Data->OpcodeSize;
 
@@ -893,14 +897,14 @@ uint8_t LengthAssemble(void *Buffer, PLengthDisasm Data)
 
 	if (Data->Flags & F_DISP)
 	{
-		__movsb(pCode, (uint8_t*)&Data->AddressDisplacement, Data->DisplacementSize);
+		memcpy(pCode, (uint8_t *)&Data->AddressDisplacement, Data->DisplacementSize);
 
 		pCode += Data->DisplacementSize;
 	}
 
 	if (Data->Flags & F_IMM)
 	{
-		__movsb(pCode, (uint8_t*)&Data->ImmediateData, Data->ImmediateDataSize);
+		memcpy(pCode, (uint8_t *)&Data->ImmediateData, Data->ImmediateDataSize);
 
 		pCode += Data->ImmediateDataSize;
 	}
