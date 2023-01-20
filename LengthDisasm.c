@@ -332,7 +332,7 @@ static uint8_t FlagsTableEx[256] =
 	/* 0F1C */	OP_INVALID,
 	/* 0F1D */	OP_INVALID,
 	/* 0F1E */	OP_INVALID,
-	/* 0F1F */	OP_NONE,
+	/* 0F1F */	OP_MODRM,
 
 	/* 0F20 */	OP_MODRM,
 	/* 0F21 */	OP_MODRM,
