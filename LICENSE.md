@@ -1,6 +1,7 @@
 MIT License
 
 Copyright (c) 2020 wolk-1024
+Copyright (c) 2023 Fengying <zxcvbnm3057@outlook.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
